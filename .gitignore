@@ -29,9 +29,10 @@
 *.sof
 *.sopc_builder
 *.summary
-*.tcl
 *~
 *example*
 *sopc_*
 
+
+# *.tcl
 # *.txt
