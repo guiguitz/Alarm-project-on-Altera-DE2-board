@@ -122,7 +122,7 @@ HEX7=>HEX7
 	processo_de_escrita : process
 	variable linhaArq : line;
 	begin
-		wait on alarme;
+		wait for OFFSET;
 		if (alarme = '1') then
 			write(linhaArq, string'("Alarme tocando: "));
 			write(linhaArq, to_integer(horaAtualSaida));
