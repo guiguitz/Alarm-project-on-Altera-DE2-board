@@ -73,9 +73,8 @@ file saidaArq       : text open write_mode is "saida.txt";
 file entradasArq    : text open read_mode is "entradas.txt";
 
 --Deinições para o clock :
-constant PERIOD     : time := 2 ns;
+constant PERIOD     : time := 40 ns;
 constant DUTY_CYCLE : real := 0.5;
-constant OFFSET     : time := 30 ns;
 
 begin
 instancia_Projeto_3: Projeto_3 port map(
@@ -103,33 +102,21 @@ HEX7=>HEX7
 );
 
 ------------------------------------------------------------------------------------
------------------ processo para gerar o sinal de clock 
-------------------------------------------------------------------------------------		
-	process    
-   begin
-		clock_loop : loop
-			clock <= '0';
-         wait for (PERIOD - (PERIOD * DUTY_CYCLE));
-         clock <= '1';
-         wait for (PERIOD * DUTY_CYCLE);
-      end loop clock_loop;
-   end process;
-	
-------------------------------------------------------------------------------------
 ------ Processo para escrever os dados de saida no arquivo saidaArq.txt
 ------------------------------------------------------------------------------------ 
 
 	processo_de_escrita : process
 	variable linhaArq : line;
 	begin
-		wait for OFFSET;
-		if (alarme = '1') then
+		while true loop
+			wait until rising_edge(alarme);
 			write(linhaArq, string'("Alarme tocando: "));
 			write(linhaArq, to_integer(horaAtualSaida));
 			write(linhaArq, ':');
 			write(linhaArq, to_integer(minAtualSaida));
 			writeline(saidaArq, linhaArq);
-		end if;
+			wait for PERIOD;
+		end loop;
 	end process processo_de_escrita;
 	
 	
@@ -137,38 +124,38 @@ HEX7=>HEX7
 ----------------- Processo para ler os dados do arquivo entradasArq.txt
 ------------------------------------------------------------------------------------
 
-	processo_de_leitura : process
+	processo_leitura_clock : process
 		variable linhaArq          : line;
 		variable entradaInteiroMin : integer;
 		variable entradaInteiroHor : integer;
 	begin
-		wait until falling_edge(clock);
-		while not endfile(entradasArq) loop
-			if leituraFlag = '1' then
-				readline(entradasArq, linhaArq);
-				read(linhaArq, entradaInteiroHor);
-				horaAlarme0 <= to_unsigned(entradaInteiroHor, 5);
-				readline(entradasArq, linhaArq);
-				read(linhaArq, entradaInteiroMin);
-				minAlarme0 <= to_unsigned(entradaInteiroMin, 6);
-				
-				readline(entradasArq, linhaArq);
-				read(linhaArq, entradaInteiroHor);
-				horaAlarme1 <= to_unsigned(entradaInteiroHor, 5);
-				readline(entradasArq, linhaArq);
-				read(linhaArq, entradaInteiroMin);
-				minAlarme1 <= to_unsigned(entradaInteiroMin, 6);
-				
-				readline(entradasArq, linhaArq);
-				read(linhaArq, entradaInteiroHor);
-				horaAlarme2 <= to_unsigned(entradaInteiroHor, 5);
-				readline(entradasArq, linhaArq);
-				read(linhaArq, entradaInteiroMin);
-				minAlarme2 <= to_unsigned(entradaInteiroMin, 6);
-			end if;
-		end loop;
-		leituraFlag <= '0';
-		wait;
-	end process processo_de_leitura;	
+		readline(entradasArq, linhaArq);
+		read(linhaArq, entradaInteiroHor);
+		horaAlarme0 <= to_unsigned(entradaInteiroHor, 5);
+		readline(entradasArq, linhaArq);
+		read(linhaArq, entradaInteiroMin);
+		minAlarme0 <= to_unsigned(entradaInteiroMin, 6);
+		
+		readline(entradasArq, linhaArq);
+		read(linhaArq, entradaInteiroHor);
+		horaAlarme1 <= to_unsigned(entradaInteiroHor, 5);
+		readline(entradasArq, linhaArq);
+		read(linhaArq, entradaInteiroMin);
+		minAlarme1 <= to_unsigned(entradaInteiroMin, 6);
+		
+		readline(entradasArq, linhaArq);
+		read(linhaArq, entradaInteiroHor);
+		horaAlarme2 <= to_unsigned(entradaInteiroHor, 5);
+		readline(entradasArq, linhaArq);
+		read(linhaArq, entradaInteiroMin);
+		minAlarme2 <= to_unsigned(entradaInteiroMin, 6);
+		
+		clock_loop : loop
+			clock <= '0';
+         wait for (PERIOD - (PERIOD * DUTY_CYCLE));
+         clock <= '1';
+         wait for (PERIOD * DUTY_CYCLE);
+      end loop clock_loop;
+	end process processo_leitura_clock;	
 
 end teste;
