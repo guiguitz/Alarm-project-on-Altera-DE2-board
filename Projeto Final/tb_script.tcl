@@ -22,6 +22,6 @@ add wave sim:/tb_Projeto_3/*
 view wave
 view structure
 view signals
-run 50ns
+run 200ns
 #quit -force
 

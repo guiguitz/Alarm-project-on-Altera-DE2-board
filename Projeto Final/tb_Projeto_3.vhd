@@ -13,34 +13,42 @@ architecture teste of tb_Projeto_3 is
 component Projeto_3 is
 port (
 		--Entradas:
-		reset      : in    std_logic; -- reset input
-		clock      : in    std_logic; -- clock input
-		horaAlarme : in    unsigned(4 downto 0);
-		minAlarme  : in    unsigned(5 downto 0);
+		reset          : in    std_logic; -- reset input
+		clock          : in    std_logic; -- clock input
+		HoraAlarme0 	: in    unsigned(4 downto 0);
+		MinAlarme0  	: in    unsigned(5 downto 0);
+		HoraAlarme1 	: in    unsigned(4 downto 0);
+		MinAlarme1  	: in    unsigned(5 downto 0);
+		HoraAlarme2 	: in    unsigned(4 downto 0);
+		MinAlarme2     : in    unsigned(5 downto 0);
 		
 		--Saídas:
-		alarme         : out   std_logic;
+		alarme         : out std_logic;
 		segAtualSaida  : out unsigned(5 downto 0);
 	   minAtualSaida  : out unsigned(5 downto 0);
 	   horaAtualSaida : out unsigned(4 downto 0);
 		
 		--Leds de 7 segmentos:
-		HEX0       : out   std_logic_vector(6 downto 0);
-		HEX1       : out   std_logic_vector(6 downto 0);
-		HEX2       : out   std_logic_vector(6 downto 0);
-		HEX3       : out   std_logic_vector(6 downto 0);
-		HEX4       : out   std_logic_vector(6 downto 0);
-		HEX5       : out   std_logic_vector(6 downto 0);
-		HEX6       : out   std_logic_vector(6 downto 0);
-		HEX7       : out   std_logic_vector(6 downto 0)
+		HEX0      	   : out   std_logic_vector(6 downto 0);
+		HEX1       		: out   std_logic_vector(6 downto 0);
+		HEX2       		: out   std_logic_vector(6 downto 0);
+		HEX3       		: out   std_logic_vector(6 downto 0);
+		HEX4       		: out   std_logic_vector(6 downto 0);
+		HEX5       		: out   std_logic_vector(6 downto 0);
+		HEX6       		: out   std_logic_vector(6 downto 0);
+		HEX7       		: out   std_logic_vector(6 downto 0)
 		);
 end component;
 
 --Sinais para o port map:
 signal reset          : std_logic := '0';
 signal clock          : std_logic := '0';
-signal horaAlarme     : unsigned(4 downto 0) := "00000";
-signal minAlarme      : unsigned(5 downto 0) := "000000";
+signal horaAlarme0    : unsigned(4 downto 0) := "00000";
+signal minAlarme0     : unsigned(5 downto 0) := "000000";
+signal horaAlarme1    : unsigned(4 downto 0) := "00000";
+signal minAlarme1     : unsigned(5 downto 0) := "000000";
+signal horaAlarme2    : unsigned(4 downto 0) := "00000";
+signal minAlarme2     : unsigned(5 downto 0) := "000000";
 signal segAtualSaida  : unsigned(5 downto 0) := "000000";
 signal minAtualSaida  : unsigned(5 downto 0) := "000000";
 signal horaAtualSaida : unsigned(4 downto 0) := "00000";
@@ -55,9 +63,6 @@ signal HEX6           : std_logic_vector(6 downto 0) := "0000000";
 signal HEX7           : std_logic_vector(6 downto 0) := "0000000";
 
 --Sinais internos:
-signal segAtualAux  : unsigned(5 downto 0) := "000000";
-signal minAtualAux  : unsigned(5 downto 0) := "000000";
-signal horaAtualAux : unsigned(4 downto 0) := "00000";
 
 --Flags:
 signal escritaFlag  : std_logic := '1';
@@ -65,20 +70,23 @@ signal leituraFlag  : std_logic := '1';
 
 --Arquivo de saída:
 file saidaArq       : text open write_mode is "saida.txt";
-file entradasArq    : text open write_mode is "entradas.txt";
+file entradasArq    : text open read_mode is "entradas.txt";
 
---Clock period definitions
+--Deinições para o clock :
 constant PERIOD     : time := 2 ns;
 constant DUTY_CYCLE : real := 0.5;
 constant OFFSET     : time := 30 ns;
 
 begin
 instancia_Projeto_3: Projeto_3 port map(
-
 reset=>reset,
 clock=>clock,
-horaAlarme=>horaAlarme,
-minAlarme=>minAlarme,
+horaAlarme0=>horaAlarme0,
+minAlarme0=>minAlarme0,
+horaAlarme1=>horaAlarme1,
+minAlarme1=>minAlarme1,
+horaAlarme2=>horaAlarme2,
+minAlarme2=>minAlarme2,
 segAtualSaida=>segAtualSaida,
 minAtualSaida=>minAtualSaida,
 horaAtualSaida=>horaAtualSaida,
@@ -106,21 +114,22 @@ HEX7=>HEX7
          wait for (PERIOD * DUTY_CYCLE);
       end loop clock_loop;
    end process;
-
+	
 ------------------------------------------------------------------------------------
 ------ Processo para escrever os dados de saida no arquivo saidaArq.txt
 ------------------------------------------------------------------------------------ 
+
 	processo_de_escrita : process
-	variable linha : line;
+	variable linhaArq : line;
 	begin
-		wait until clock = '0';
-			if (escritaFlag = '1') then
-				write(linha, to_integer(signed(horaAlarme)));
-				write(linha, ':');
-				write(linha, to_integer(signed(minAlarme)));
-				writeline(saidaArq, linha);
-				escritaFlag <= '0';
-			end if;
+		wait on alarme;
+		if (alarme = '1') then
+			write(linhaArq, string'("Alarme tocando: "));
+			write(linhaArq, to_integer(horaAtualSaida));
+			write(linhaArq, ':');
+			write(linhaArq, to_integer(minAtualSaida));
+			writeline(saidaArq, linhaArq);
+		end if;
 	end process processo_de_escrita;
 	
 	
@@ -128,23 +137,38 @@ HEX7=>HEX7
 ----------------- Processo para ler os dados do arquivo entradasArq.txt
 ------------------------------------------------------------------------------------
 
---	processo_de_leitura : process
---		variable linha : line;
---		variable input : std_logic_vector(5 downto 0) := "000111";
---	begin
---		wait until falling_edge(clock);
---		while not endfile(saida) loop
---			if read_data_in = '1' then
---				readline(saida, linea);	--Reading the alarm hour
---				read(linea, input);
---				HoraAlarme <= input;
---				readline(saida, linea);	--Reading the alarm min
---				read(linea, input);
---				MinAlarme <= input;
---			end if;
---			wait for PERIOD;
---		end loop;
---		wait;
---	end process processo_de_leitura;	
+	processo_de_leitura : process
+		variable linhaArq          : line;
+		variable entradaInteiroMin : integer;
+		variable entradaInteiroHor : integer;
+	begin
+		wait until falling_edge(clock);
+		while not endfile(entradasArq) loop
+			if leituraFlag = '1' then
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroHor);
+				horaAlarme0 <= to_unsigned(entradaInteiroHor, 5);
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroMin);
+				minAlarme0 <= to_unsigned(entradaInteiroMin, 6);
+				
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroHor);
+				horaAlarme1 <= to_unsigned(entradaInteiroHor, 5);
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroMin);
+				minAlarme1 <= to_unsigned(entradaInteiroMin, 6);
+				
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroHor);
+				horaAlarme2 <= to_unsigned(entradaInteiroHor, 5);
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroMin);
+				minAlarme2 <= to_unsigned(entradaInteiroMin, 6);
+			end if;
+		end loop;
+		leituraFlag <= '0';
+		wait;
+	end process processo_de_leitura;	
 
 end teste;

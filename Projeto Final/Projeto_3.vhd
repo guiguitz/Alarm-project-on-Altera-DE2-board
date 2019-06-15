@@ -9,10 +9,14 @@ entity Projeto_3 is
 	);
 	port (
 		--Entradas:
-		reset      : in    std_logic; -- reset input
-		clock      : in    std_logic; -- clock input
-		HoraAlarme : in    unsigned(4 downto 0);
-		MinAlarme  : in    unsigned(5 downto 0);
+		reset      		: in    std_logic; -- reset input
+		clock      		: in    std_logic; -- clock input
+		HoraAlarme0 	: in    unsigned(4 downto 0);
+		MinAlarme0  	: in    unsigned(5 downto 0);
+		HoraAlarme1 	: in    unsigned(4 downto 0);
+		MinAlarme1  	: in    unsigned(5 downto 0);
+		HoraAlarme2 	: in    unsigned(4 downto 0);
+		MinAlarme2     : in    unsigned(5 downto 0);
 		
 		--Saídas:
 		alarme         : out   std_logic;
@@ -21,14 +25,14 @@ entity Projeto_3 is
 	   horaAtualSaida : out unsigned(4 downto 0) := "00000";
 		
 		--Leds de 7 segmentos:
-		HEX0       : out   std_logic_vector(6 downto 0) := "1111111";
-		HEX1       : out   std_logic_vector(6 downto 0) := "1111111";
-		HEX2       : out   std_logic_vector(6 downto 0);
-		HEX3       : out   std_logic_vector(6 downto 0);
-		HEX4       : out   std_logic_vector(6 downto 0);
-		HEX5       : out   std_logic_vector(6 downto 0);
-		HEX6       : out   std_logic_vector(6 downto 0);
-		HEX7       : out   std_logic_vector(6 downto 0)
+		HEX0     	   : out   std_logic_vector(6 downto 0) := "1111111";
+		HEX1       	   : out   std_logic_vector(6 downto 0) := "1111111";
+		HEX2           : out   std_logic_vector(6 downto 0);
+		HEX3       	   : out   std_logic_vector(6 downto 0);
+		HEX4       	   : out   std_logic_vector(6 downto 0);
+		HEX5       	   : out   std_logic_vector(6 downto 0);
+		HEX6       	   : out   std_logic_vector(6 downto 0);
+		HEX7       	   : out   std_logic_vector(6 downto 0)
 		);
 end Projeto_3;
 
@@ -203,14 +207,15 @@ begin
 	end process processo_7_segmentos;
 	
   --Process do Alarme:	
-	processo_alarme : process (minAtualAux, horaAtualAux, minAlarme, horaAlarme)
+	processo_alarme : process (minAtualAux, horaAtualAux, minAlarme0, horaAlarme0, minAlarme1, horaAlarme1, minAlarme2, horaAlarme2)
 	begin	
-		if(horaAtualAux = HoraAlarme and minAtualAux = MinAlarme) then 
+		if((horaAtualAux = HoraAlarme0 and minAtualAux = MinAlarme0) or (horaAtualAux = HoraAlarme1 and minAtualAux = MinAlarme1) or (horaAtualAux = HoraAlarme2 and minAtualAux = MinAlarme2)) then 
 			alarme <= '1';
 		else
 			alarme <= '0';
 		end if;
 	end process processo_alarme;
+	
 		
 	proces_atualiza_horario_saida : process (segAtualAux, minAtualAux, horaAtualAux)
 	begin
