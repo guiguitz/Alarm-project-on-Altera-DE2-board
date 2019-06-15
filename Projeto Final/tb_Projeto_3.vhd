@@ -74,7 +74,6 @@ file entradasArq    : text open read_mode is "entradas.txt";
 
 --Deinições para o clock :
 constant PERIOD     : time := 40 ns;
-constant DUTY_CYCLE : real := 0.5;
 
 begin
 instancia_Projeto_3: Projeto_3 port map(
@@ -102,6 +101,44 @@ HEX7=>HEX7
 );
 
 ------------------------------------------------------------------------------------
+----------------- processo para gerar o sinal de clock 
+------------------------------------------------------------------------------------		
+	process 
+		variable linhaArq          : line;
+		variable entradaInteiroMin : integer;
+		variable entradaInteiroHor : integer;
+   begin
+	
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroHor);
+				horaAlarme0 <= to_unsigned(entradaInteiroHor, 5);
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroMin);
+				minAlarme0 <= to_unsigned(entradaInteiroMin, 6);
+				
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroHor);
+				horaAlarme1 <= to_unsigned(entradaInteiroHor, 5);
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroMin);
+				minAlarme1 <= to_unsigned(entradaInteiroMin, 6);
+				
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroHor);
+				horaAlarme2 <= to_unsigned(entradaInteiroHor, 5);
+				readline(entradasArq, linhaArq);
+				read(linhaArq, entradaInteiroMin);
+				minAlarme2 <= to_unsigned(entradaInteiroMin, 6);
+				
+		clock_loop : loop
+			clock <= '0';
+         wait for (PERIOD);
+         clock <= '1';
+         wait for (PERIOD);
+      end loop clock_loop;
+   end process;
+	
+------------------------------------------------------------------------------------
 ------ Processo para escrever os dados de saida no arquivo saidaArq.txt
 ------------------------------------------------------------------------------------ 
 
@@ -109,7 +146,7 @@ HEX7=>HEX7
 	variable linhaArq : line;
 	begin
 		while true loop
-			wait until rising_edge(alarme);
+		wait until rising_edge(alarme);
 			write(linhaArq, string'("Alarme tocando: "));
 			write(linhaArq, to_integer(horaAtualSaida));
 			write(linhaArq, ':');
@@ -117,45 +154,12 @@ HEX7=>HEX7
 			writeline(saidaArq, linhaArq);
 			wait for PERIOD;
 		end loop;
+		
 	end process processo_de_escrita;
 	
 	
 ------------------------------------------------------------------------------------
 ----------------- Processo para ler os dados do arquivo entradasArq.txt
 ------------------------------------------------------------------------------------
-
-	processo_leitura_clock : process
-		variable linhaArq          : line;
-		variable entradaInteiroMin : integer;
-		variable entradaInteiroHor : integer;
-	begin
-		readline(entradasArq, linhaArq);
-		read(linhaArq, entradaInteiroHor);
-		horaAlarme0 <= to_unsigned(entradaInteiroHor, 5);
-		readline(entradasArq, linhaArq);
-		read(linhaArq, entradaInteiroMin);
-		minAlarme0 <= to_unsigned(entradaInteiroMin, 6);
-		
-		readline(entradasArq, linhaArq);
-		read(linhaArq, entradaInteiroHor);
-		horaAlarme1 <= to_unsigned(entradaInteiroHor, 5);
-		readline(entradasArq, linhaArq);
-		read(linhaArq, entradaInteiroMin);
-		minAlarme1 <= to_unsigned(entradaInteiroMin, 6);
-		
-		readline(entradasArq, linhaArq);
-		read(linhaArq, entradaInteiroHor);
-		horaAlarme2 <= to_unsigned(entradaInteiroHor, 5);
-		readline(entradasArq, linhaArq);
-		read(linhaArq, entradaInteiroMin);
-		minAlarme2 <= to_unsigned(entradaInteiroMin, 6);
-		
-		clock_loop : loop
-			clock <= '0';
-         wait for (PERIOD - (PERIOD * DUTY_CYCLE));
-         clock <= '1';
-         wait for (PERIOD * DUTY_CYCLE);
-      end loop clock_loop;
-	end process processo_leitura_clock;	
 
 end teste;

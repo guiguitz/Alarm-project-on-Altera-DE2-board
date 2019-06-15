@@ -129,7 +129,6 @@ set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -sectio
 set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH tb_Projeto_3 -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME tb_Projeto_3 -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id tb_Projeto_3
-set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "190 s" -section_id tb_Projeto_3
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME tb_Projeto_3 -section_id tb_Projeto_3
 set_location_assignment PIN_AE22 -to segAtualSaida[0]
 set_location_assignment PIN_AF22 -to segAtualSaida[1]
