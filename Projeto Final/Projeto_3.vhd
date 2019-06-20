@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity Projeto_3 is
 	generic
 	(
-		Pulsos1Seg  : integer := 5 -- Contidade de pulsos de clock para 1 segundo. Como o clock é de 1ns, precisamos de 1x10^9 pulsos.
+		Pulsos1Seg  : integer := 50000000 -- Contidade de pulsos de clock para 1 segundo. Como o clock é de 1ns, precisamos de 1x10^9 pulsos.
 	);
 	port (
 		--Entradas:
@@ -39,7 +39,7 @@ end Projeto_3;
 architecture arch of Projeto_3 is
 	type state_type is (I, P, S, M, H);
 	signal state        : state_type;
-	signal pulsos       : integer range 0 to 5;
+	signal pulsos       : integer range 0 to 50000000;
 	signal segAtualAux  : unsigned(5 downto 0) := "000000";
 	signal minAtualAux  : unsigned(5 downto 0) := "000000";
 	signal horaAtualAux : unsigned(4 downto 0) := "00000";
